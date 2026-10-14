@@ -15,6 +15,11 @@ function AppLayout() {
       key: '/login',
       label: <Link to="/login">Вход</Link>,
     },
+
+    {
+      key: '/profile',
+      label: <Link to="/profile">Личный кабинет</Link>,
+    },
   ]
 
   return (
