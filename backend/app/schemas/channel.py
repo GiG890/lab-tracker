@@ -11,6 +11,9 @@ class ChannelBase(BaseModel):
 class ChannelCreate(ChannelBase):
     owner_id: int
 
+class ChannelUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
 
 class ChannelRead(ChannelBase):
     id: int

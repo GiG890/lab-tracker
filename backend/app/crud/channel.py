@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models import Channel, ChannelMember
-from app.schemas import ChannelCreate, ChannelMemberCreate
+from app.schemas import ChannelCreate, ChannelUpdate, ChannelMemberCreate
 
 
 def get_channel(db: Session, channel_id: int) -> Channel | None:
@@ -19,6 +19,19 @@ def create_channel(db: Session, channel_data: ChannelCreate) -> Channel:
         owner_id=channel_data.owner_id,
     )
     db.add(db_channel)
+    db.commit()
+    db.refresh(db_channel)
+    return db_channel
+
+def update_channel(
+    db: Session, channel_id: int, channel_data: ChannelUpdate
+) -> Channel | None:
+    db_channel = get_channel(db, channel_id)
+    if db_channel is None:
+        return None
+    update_data = channel_data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_channel, field, value)
     db.commit()
     db.refresh(db_channel)
     return db_channel

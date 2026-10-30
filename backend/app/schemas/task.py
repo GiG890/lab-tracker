@@ -13,6 +13,12 @@ class TaskBase(BaseModel):
 class TaskCreate(TaskBase):
     channel_id: int
 
+class TaskUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    type: str | None = None
+    deadline: datetime | None = None
+
 
 class TaskRead(TaskBase):
     id: int

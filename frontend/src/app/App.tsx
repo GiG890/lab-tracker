@@ -1,10 +1,10 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import AppLayout from './layouts/AppLayout'
-import LoginPage from './pages/LoginPage'
-import SubjectsPage from './pages/SubjectsPage'
-import TasksPage from './pages/TasksPage'
-import NotFoundPage from './pages/NotFoundPage'
-import ProfilePage from './pages/ProfilePage'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import AppLayout from '@/layouts/AppLayout'; 
+import { SubjectsPage } from '@/pages/subjects/ui/SubjectsPage';
+import { TasksPage } from '@/pages/tasks/ui/TasksPage';
+import { ProfilePage } from '@/pages/profile/ui/ProfilePage';
+import { LoginPage } from '@/pages/login/ui/LoginPage';
+import { NotFoundPage } from '@/pages/not-found/ui/NotFoundPage';
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

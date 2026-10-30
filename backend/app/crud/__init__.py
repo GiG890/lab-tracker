@@ -3,12 +3,14 @@ from app.crud.user import (
     get_user_by_email,
     get_users,
     create_user,
+    update_user,
     delete_user,
 )
 from app.crud.channel import (
     get_channel,
     get_channels,
     create_channel,
+    update_channel,
     delete_channel,
     get_member,
     get_channel_members,
@@ -20,6 +22,7 @@ from app.crud.task import (
     get_tasks,
     get_tasks_by_channel,
     create_task,
+    update_task,
     delete_task,
 )
 
@@ -28,10 +31,12 @@ __all__ = [
     "get_user_by_email",
     "get_users",
     "create_user",
+    "update_user",
     "delete_user",
     "get_channel",
     "get_channels",
     "create_channel",
+    "update_channel",
     "delete_channel",
     "get_member",
     "get_channel_members",
@@ -41,5 +46,6 @@ __all__ = [
     "get_tasks",
     "get_tasks_by_channel",
     "create_task",
+    "update_task",
     "delete_task",
 ]

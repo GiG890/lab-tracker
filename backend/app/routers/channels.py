@@ -6,10 +6,10 @@ from app.database import get_db
 from app.schemas import (
     ChannelCreate,
     ChannelRead,
+    ChannelUpdate,
     ChannelMemberCreate,
     ChannelMemberRead,
 )
-
 
 router = APIRouter(prefix="/channels", tags=["channels"])
 
@@ -39,6 +39,20 @@ def get_channel(channel_id: int, db: Session = Depends(get_db)):
             detail="Channel not found",
         )
     return db_channel
+
+@router.patch("/{channel_id}", response_model=ChannelRead)
+def update_channel(
+    channel_id: int,
+    channel: ChannelUpdate,
+    db: Session = Depends(get_db),
+):
+    db_channel = crud.get_channel(db, channel_id)
+    if db_channel is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Channel not found",
+        )
+    return crud.update_channel(db, channel_id, channel)
 
 
 @router.delete("/{channel_id}", status_code=status.HTTP_204_NO_CONTENT)
