@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.database import get_db
+from app.dependencies import get_current_user
+from app.models import User
 from app.schemas import TaskCreate, TaskRead, TaskUpdate
 
 
@@ -15,7 +17,11 @@ def list_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(
+    task: TaskCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     channel = crud.get_channel(db, task.channel_id)
     if channel is None:
         raise HTTPException(
@@ -35,11 +41,13 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
         )
     return db_task
 
+
 @router.patch("/{task_id}", response_model=TaskRead)
 def update_task(
     task_id: int,
     task: TaskUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     db_task = crud.get_task(db, task_id)
     if db_task is None:
@@ -51,7 +59,11 @@ def update_task(
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_task(task_id: int, db: Session = Depends(get_db)):
+def delete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     db_task = crud.delete_task(db, task_id)
     if db_task is None:
         raise HTTPException(

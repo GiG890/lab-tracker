@@ -1,58 +1,54 @@
-import { Card, Progress, List, Tag, Typography } from 'antd';
-import type { User, UserProgress, UpcomingDeadline } from '@/entities/user/model/types';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, Button, Spin, message, Descriptions } from 'antd';
+import { useAuth } from '@/app/providers/AuthProvider';
+import { apiRequest } from '@/shared/api/client';
 
-const { Title, Text } = Typography;
-
-const student: User = {
-  id: 1,
-  name: 'Иванов Иван',
-  group: 'БПИ2402', 
-  role: 'Студент',
-  email: 'ivanov@example.com',
-  created_at: new Date().toISOString(),
-};
-
-const progress: UserProgress = {
-  percent: 42,
-  completed: 5,
-  total: 12,
-};
-
-const upcomingDeadlines: UpcomingDeadline[] = [
-  { id: 1, title: 'Лабораторная работа №1', deadline: '12.09.2026' },
-  { id: 2, title: 'Домашнее задание №1', deadline: '15.09.2026' },
-];
+interface UserProfile {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  created_at: string;
+}
 
 export const ProfilePage = () => {
+  const { user, logout } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    apiRequest<UserProfile>('/users/me')
+      .then(setProfile)
+      .catch(() => message.error('Не удалось загрузить профиль'))
+      .finally(() => setLoading(false));
+  }, [user, navigate]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  if (loading) return <Spin />;
+
   return (
-    <div className="page-transition">
-      <Title level={2}>Личный кабинет</Title>
-
-      <Card style={{ marginBottom: 16 }}>
-        <Title level={4} style={{ margin: 0 }}>
-          {student.name}
-        </Title>
-
-        <Text type="secondary">Группа: {student.group}</Text>
-        <br />
-        <Text type="secondary">Роль: {student.role}</Text>
-      </Card>
-
-      <Card title="Прогресс" style={{ marginBottom: 16 }}>
-        <Progress percent={progress.percent} />
-        <Text>Сдано {progress.completed} из {progress.total} заданий</Text>
-      </Card>
-
-      <Card title="Ближайшие дедлайны">
-        <List
-          dataSource={upcomingDeadlines}
-          renderItem={(item) => (
-            <List.Item>
-              {item.title} — <Tag color="red">{item.deadline}</Tag>
-            </List.Item>
-          )}
-        />
-      </Card>
-    </div>
+    <Card title="Личный кабинет">
+      {profile && (
+        <Descriptions column={1}>
+          <Descriptions.Item label="Имя">{profile.name}</Descriptions.Item>
+          <Descriptions.Item label="Email">{profile.email}</Descriptions.Item>
+          <Descriptions.Item label="Роль">{profile.role}</Descriptions.Item>
+        </Descriptions>
+      )}
+      <Button danger onClick={handleLogout} style={{ marginTop: 16 }}>
+        Выйти
+      </Button>
+    </Card>
   );
 };

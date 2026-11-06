@@ -9,6 +9,13 @@ from app.schemas.channel import (
     ChannelMemberRead,
 )
 from app.schemas.task import TaskBase, TaskCreate, TaskRead, TaskUpdate
+from app.schemas.auth import (
+    LoginRequest,
+    RefreshRequest,
+    LogoutRequest,
+    AccessToken,
+    TokenPair,
+)
 
 __all__ = [
     "UserBase",
@@ -24,6 +31,11 @@ __all__ = [
     "ChannelMemberRead",
     "TaskBase",
     "TaskCreate",
-    "TaskUpdate"
+    "TaskUpdate",
     "TaskRead",
+    "LoginRequest",
+    "RefreshRequest",
+    "LogoutRequest",
+    "AccessToken",
+    "TokenPair",
 ]

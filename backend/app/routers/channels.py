@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.database import get_db
+from app.dependencies import get_current_user
+from app.models import User
 from app.schemas import (
     ChannelCreate,
     ChannelRead,
@@ -20,13 +22,12 @@ def list_channels(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 
 
 @router.post("/", response_model=ChannelRead, status_code=status.HTTP_201_CREATED)
-def create_channel(channel: ChannelCreate, db: Session = Depends(get_db)):
-    owner = crud.get_user(db, channel.owner_id)
-    if owner is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Owner user does not exist",
-        )
+def create_channel(
+    channel: ChannelCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    channel.owner_id = current_user.id
     return crud.create_channel(db, channel)
 
 
@@ -40,11 +41,13 @@ def get_channel(channel_id: int, db: Session = Depends(get_db)):
         )
     return db_channel
 
+
 @router.patch("/{channel_id}", response_model=ChannelRead)
 def update_channel(
     channel_id: int,
     channel: ChannelUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     db_channel = crud.get_channel(db, channel_id)
     if db_channel is None:
@@ -52,17 +55,32 @@ def update_channel(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Channel not found",
         )
+    if db_channel.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only owner can update channel",
+        )
     return crud.update_channel(db, channel_id, channel)
 
 
 @router.delete("/{channel_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_channel(channel_id: int, db: Session = Depends(get_db)):
-    db_channel = crud.delete_channel(db, channel_id)
+def delete_channel(
+    channel_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    db_channel = crud.get_channel(db, channel_id)
     if db_channel is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Channel not found",
         )
+    if db_channel.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only owner can delete channel",
+        )
+    crud.delete_channel(db, channel_id)
     return None
 
 

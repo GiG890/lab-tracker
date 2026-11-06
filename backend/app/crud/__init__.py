@@ -25,6 +25,11 @@ from app.crud.task import (
     update_task,
     delete_task,
 )
+from app.crud.refresh_token import (
+    create_refresh_token,
+    get_refresh_token,
+    revoke_refresh_token,
+)
 
 __all__ = [
     "get_user",
@@ -48,4 +53,7 @@ __all__ = [
     "create_task",
     "update_task",
     "delete_task",
+    "create_refresh_token",
+    "get_refresh_token",
+    "revoke_refresh_token",
 ]
